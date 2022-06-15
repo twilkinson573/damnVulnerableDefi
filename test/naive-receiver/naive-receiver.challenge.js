@@ -53,6 +53,11 @@ describe('[Challenge] Naive receiver', function () {
        // I could make my own Smart Contract that creates the flash loans repeatedly inside one transaction? 
        // I'll leave this as a TODO~ for another time 
 
+
+       // LESSONS =============================================================
+
+       // * Always be wary of ownership & access control, keep in mind 'who' could call your contracts and for what purposes
+
     });
 
     after(async function () {

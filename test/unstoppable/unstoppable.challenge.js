@@ -53,6 +53,11 @@ describe('[Challenge] Unstoppable', function () {
         const tx = await this.token.connect(attacker).transfer(this.pool.address, 1);
         tx.wait();
 
+       // LESSONS =============================================================
+
+       // * Be careful with assertions, especially if trying to 'sync' state in some sort of way using eqality (==)
+       // * In most cases, a `>=` will be more appropriate than a `==` (eg. see the constant sum code in Uniswap v2)
+
     });
 
     after(async function () {
