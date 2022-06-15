@@ -9,7 +9,7 @@ Created by [@tinchoabbate](https://twitter.com/tinchoabbate)
 ## Personal Progress
 
 * 1 Unstoppable ✅
-* 2 Naive receiver
+* 2 Naive receiver ✅ [bonus objective TODO~]
 * 3 Truster
 * 4 Side entrance
 * 5 The rewarder

