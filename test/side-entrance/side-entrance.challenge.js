@@ -25,6 +25,43 @@ describe('[Challenge] Side entrance', function () {
 
     it('Exploit', async function () {
         /** CODE YOUR EXPLOIT HERE */
+
+        // Could I use a similar approach here to 3? 
+        // Code an attacker smart contract, with an execute function that gives me allowance on all their ETH?
+        // If I call it from a smart contract it will execute any arbitrary code I provide in an execute() function 
+        // Will msg.sender be assigned to the Pool contract? Does approval on ETH work similarly to ERC20? Or is there another route? 
+
+        // The issue is there's two separate “accounting” systems to track state
+        // 1. Regular people keeping track of ETH balances using balances private mapping
+        // 2. Flash loans checks just using overall contract balance
+
+        // Ok think I got it, I could deposit some ETH, then take it out of the 'shared' pot
+        // The overall balance of the contract would still be the same but I will have built up a deposited allowance of ETH
+        // Then I can withdraw 'my' which would result in me having more Eth than I began with, repeat as necessary
+
+        // Second attempt. I can flashloan out the max amount of ETH then re-deposit it straight back 
+        // The overall pool contract balance will be the same but I will have 'claimed' it as a deposit under my address
+        // Then in a separate tx I simply legally withdraw it
+
+        // SOLUTION ===========================================================
+
+        const SideEntranceAttackPoolFactory = await ethers.getContractFactory('SideEntranceAttack', attacker);
+        this.attackContract = await SideEntranceAttackPoolFactory.connect(attacker).deploy(this.pool.address);
+
+        const poolBalance = await ethers.getDefaultProvider().getBalance(this.pool.address);
+        await this.attackContract.connect(attacker).attack(poolBalance);
+
+        await this.attackContract.connect(attacker).withdrawFromPool();
+
+        await this.attackContract.connect(attacker).collectFunds();
+
+
+
+        // Lessons Learned ====================================================
+
+        // Be very mindful with trying to track state using variables, you really have to make sure the system is watertight & consistent everywhere
+        // Would it be an idea to use ERC20 reciept tokens here for pool deposits/withdraws instead of the in-storage mapping?
+
     });
 
     after(async function () {
