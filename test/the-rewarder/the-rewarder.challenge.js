@@ -66,6 +66,32 @@ describe('[Challenge] The rewarder', function () {
 
     it('Exploit', async function () {
         /** CODE YOUR EXPLOIT HERE */
+
+        // Ok before I even read the code my first intinct is that I'll flashloan out a ton of DVT just at the moment of the snapshot
+        // and then return it all immediately after the snapshot has taken place
+        // I'm not 100% this would be possible, don't flashloans have to be repaid in the same tx? Let's dive in...
+
+        // So I can borrow DVT tokens from the FlashLoanerPool
+        // Then deposit them in TheRewarderPool
+        // This will mint me the accounting receipt tokens & call distributeRewards(), but at this point I don't think I'll be eligible
+        // Would there be a way to withdraw my DVT tokens to repay the flashloan without having my accounting tokens burnt? 
+
+        // If I could get isNewRewardsRound() to return true I could force a snapshot to be recorded during the distributeRewards() call as I deposit
+        // It currently returns false, writing a script that constantly checks for it to flip to 'true' and 'snipe' the first request is theoretically possible
+        // but I don't think it's a fruitful direction, especially since in the real world there'd be competition for bots like this
+
+        // Would the code execution in the flashloan have msg.sender context as FlashLoanerPool (like in TrusterLenderPool)? Would this open anything up for access control?
+
+        const RewarderAttackFactory = await ethers.getContractFactory('RewarderAttack', attacker);
+        this.attackContract = await RewarderAttackFactory.connect(attacker).deploy(this.flashLoanPool.address);
+
+        const poolBalance = await this.liquidityToken.balanceOf(this.flashLoanPool.address);
+        console.log("Flash loan balance", await ethers.utils.formatEther(poolBalance));
+
+        await this.attackContract.connect(attacker).requestFlashLoan(poolBalance);
+
+        console.log("Is new reward round?", await this.rewarderPool.isNewRewardsRound());
+
     });
 
     after(async function () {
