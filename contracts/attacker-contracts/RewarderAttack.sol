@@ -22,10 +22,10 @@ contract RewarderAttack {
     address owner;
 
     constructor(
-        FlashLoanerPool _flashLoanerPoolAddress, 
-        TheRewarderPool _theRewarderPoolAddress, 
-        DamnValuableToken _damnValuableTokenAddress, 
-        RewardToken _rewardTokenAddress
+        address _flashLoanerPoolAddress, 
+        address _theRewarderPoolAddress, 
+        address _damnValuableTokenAddress, 
+        address _rewardTokenAddress
     ) {
         owner = msg.sender;
         damnValuableToken = DamnValuableToken(_damnValuableTokenAddress);
