@@ -144,6 +144,8 @@ describe('[Challenge] Puppet', function () {
         // Lessons Learned ====================================================
         // - Oracle manipulation is real and one of the most common causes of exploits
         // - Never trust a single on-chain oracle, never use a Uniswap pool as an oracle! (UniswapV2 docs are v.clear on this point anyway)
+        // My experience implementing a custom UniswapV2 for a client definitely helped here! 
+        // As soon as I saw them using a liquidity pool as a pricing oracle I was like "this is where the fun begins ;)"
 
     });
 
