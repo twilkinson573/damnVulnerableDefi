@@ -16,7 +16,7 @@ Created by [@tinchoabbate](https://twitter.com/tinchoabbate)
 * 6 Selfie ✅
 * 7 Compromised
 * 8 Puppet ✅
-* 9 Puppet v2
+* 9 Puppet v2 ✅
 * 10 Free rider
 * 11 Backdoor
 * 12 Climber
