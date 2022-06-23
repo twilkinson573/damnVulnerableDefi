@@ -61,6 +61,11 @@ describe('Compromised challenge', function () {
 
     it('Exploit', async function () {        
         /** CODE YOUR EXPLOIT HERE */
+
+        // ooooo this one looks like a doozy lol D: 
+        // First instinct, I've gotta mess with the price coming from the oracles (to trick the exchange into selling me an NFT for a very low price)
+
+
     });
 
     after(async function () {

