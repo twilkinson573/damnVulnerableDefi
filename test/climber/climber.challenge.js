@@ -79,6 +79,10 @@ describe('[Challenge] Climber', function () {
             // Wait, what is _setRoleAdmin()? Could I call that with the Timelock as context (which is an admin) and add myself as a proposer or something?
             // Or maybe I could just call _setupRole() and give myself the proposer role? 
 
+        // How the hell do you call this OpenZeppelin::Address::functionCallWithValue lol?  https://docs.openzeppelin.com/contracts/3.x/api/utils#Address-functionCall-address-bytes- ? 
+        
+
+
 
 
 

