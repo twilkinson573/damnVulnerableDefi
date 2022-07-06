@@ -18,7 +18,7 @@ Created by [@tinchoabbate](https://twitter.com/tinchoabbate)
 * 8 Puppet ✅
 * 9 Puppet v2 ✅
 * 10 Free rider
-* 11 Backdoor
+* 11 Backdoor ✅
 * 12 Climber
 * 13 Junior miners
 
