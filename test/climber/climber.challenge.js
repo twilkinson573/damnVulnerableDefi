@@ -53,6 +53,46 @@ describe('[Challenge] Climber', function () {
 
     it('Exploit', async function () {        
         /** CODE YOUR EXPLOIT HERE */
+
+        // Initial thoughts: ok so the timelock is setup as part of ClimberVault::initialize
+        // Any chance I could upgrade the vault and set myself as the owner/proposer somehow?
+        // Only the sweeper role is allowed to call ClimberVault::sweepFunds
+        // If I can force a contract upgrade through with my address as the 'sweeper' param then I would have access
+
+        // With the UUPS proxy pattern the upgradeable machinery is stored in the implementation (rather than the proxy a la the transparent pattern)
+            // https://github.com/OpenZeppelin/openzeppelin-contracts-upgradeable/tree/master/contracts/proxy
+            // Inheriting from OZ's UUPSUpgradeable contract is what provides the upgradeable machinery
+            // Along with overriding _authorizeUpgrade() for setting a relevant access control mechanism
+
+        // In our case, only the Timelock can make upgrades
+        // So I have to force the Timelock to execute a proposal to upgrade the contract with my attacker address as the sweeper param (pray for me)
+        // However only the proposer role can schedule new actions to execute
+        // The only entry point I have anywhere is ClimberTimelock::execute so I guess I start here, even though there are no operations currently scheduled
+        // Line 105 where I can call an arbitrary function seems interesting
+        // Especially considering the only thing I have to do to make it pass is ensure  ```require(getOperationState(id) == OperationState.ReadyForExecution);```
+        // If I could reverse engineer how to make that work, oh wait I believe that function needs the action to be scheduled
+        // What context would the func on line 105 be executed in?
+        // If the context is the Timelock itself, what would that open up? 
+            // I could updateDelay()
+            // The Timelock doesn't have role of proposer, only admin
+            // What other things can an admin role do? I should check out OZ Access Control
+            // Wait, what is _setRoleAdmin()? Could I call that with the Timelock as context (which is an admin) and add myself as a proposer or something?
+            // Or maybe I could just call _setupRole() and give myself the proposer role? 
+
+
+
+
+        const ClimberAttackFactory = await ethers.getContractFactory('ClimberAttack', attacker);
+        this.attackContract = await ClimberAttackFactory.connect(attacker).deploy(
+            this.timelock.address,
+        );
+
+        await this.attackContract.connect(attacker).triggerAttack();
+ 
+        // console.log("hmm:", await this.timelock.getOperationState(ethers.utils.formatBytes32String("0")));
+
+
+
     });
 
     after(async function () {
