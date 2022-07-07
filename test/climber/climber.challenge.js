@@ -93,6 +93,8 @@ describe('[Challenge] Climber', function () {
         // Ah, actually I need to create a new ClimberVaultV2 contract & deploy an instance of that to give me a new ::initialize to just give me sweeper role 
         // since I shouldn't re-run the whole original ::initialize
 
+        // Ok! I'm confident I'm sweeping the funds now, last step is to create the proposal and make it pass the guard on L108 
+
 
         // SOLUTION ===========================================================
         const MaliciousVaultFactory = await ethers.getContractFactory('ClimberVaultV2', attacker);
