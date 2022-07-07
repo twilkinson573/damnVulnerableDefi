@@ -79,23 +79,42 @@ describe('[Challenge] Climber', function () {
             // Wait, what is _setRoleAdmin()? Could I call that with the Timelock as context (which is an admin) and add myself as a proposer or something?
             // Or maybe I could just call _setupRole() and give myself the proposer role? 
 
-        // How the hell do you call this OpenZeppelin::Address::functionCallWithValue lol?  https://docs.openzeppelin.com/contracts/3.x/api/utils#Address-functionCall-address-bytes- ? 
-        
+        // How the hell do you call this OpenZeppelin::Address::functionCallWithValue lol??
+        // https://docs.openzeppelin.com/contracts/3.x/api/utils#Address-functionCall-address-bytes-
+
+        // Crucially, they have the require guard on 108 after the external calls (violating checks-effects-interaction), allowing me to make my arbitrary calls 
+        // My calls: 
+            // 1) set delay to 0
+            // 2) give myself proposer role
+            // 4) Trigger an upgrade of the vault with my attacker contract as the sweeper role (or alternatively re-write sweep func to allow me to call it)
+            // 4) Make a proposal to satisfy the require L108 statement (How do I satisfy this?)
+        // Then I sweep the funds in the same tx then send them to my attacker EOA address
+
+        // Ah, actually I need to create a new ClimberVaultV2 contract & deploy an instance of that to give me a new ::initialize to just give me sweeper role 
+        // since I shouldn't re-run the whole original ::initialize
 
 
-
-
+        // SOLUTION ===========================================================
+        const MaliciousVaultFactory = await ethers.getContractFactory('ClimberVaultV2', attacker);
+        this.maliciousVault = await MaliciousVaultFactory.connect(attacker).deploy();
+ 
 
         const ClimberAttackFactory = await ethers.getContractFactory('ClimberAttack', attacker);
         this.attackContract = await ClimberAttackFactory.connect(attacker).deploy(
             this.timelock.address,
+            this.vault.address,
+            this.maliciousVault.address,
+            this.token.address
         );
 
         await this.attackContract.connect(attacker).triggerAttack();
  
         // console.log("hmm:", await this.timelock.getOperationState(ethers.utils.formatBytes32String("0")));
 
-
+        // LESSONS LEARNED ====================================================
+        // Once again it seems like tighter access control could have been more beneficial here
+        // For something that's clearly so organisationally driven, such as this timelock contract to control a vault, it seems preferable to whitelist who can call ::execute
+        // Especially since that is where the arbitrary code execution comes from (even though there are checks in place to try ensure the actions were previously queued)
 
     });
 
