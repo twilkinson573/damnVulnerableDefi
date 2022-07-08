@@ -29,12 +29,6 @@ contract ClimberVaultV2 is Initializable, OwnableUpgradeable, UUPSUpgradeable {
     /// @custom:oz-upgrades-unsafe-allow constructor
     constructor() initializer {}
 
-    function initialize(address sweeper)  external {
-        _setSweeper(sweeper);
-        _setLastWithdrawal(block.timestamp);
-        _lastWithdrawalTimestamp = block.timestamp;
-    }
-
     // Allows the owner to send a limited amount of tokens to a recipient every now and then
     function withdraw(address tokenAddress, address recipient, uint256 amount) external onlyOwner {
         require(amount <= WITHDRAWAL_LIMIT, "Withdrawing too much");
@@ -47,9 +41,9 @@ contract ClimberVaultV2 is Initializable, OwnableUpgradeable, UUPSUpgradeable {
     }
 
     // Allows trusted sweeper account to retrieve any tokens
-    function sweepFunds(address tokenAddress) external onlySweeper {
+    function sweepFunds(address tokenAddress) external onlyOwner {
         IERC20 token = IERC20(tokenAddress);
-        require(token.transfer(_sweeper, token.balanceOf(address(this))), "Transfer failed");
+        require(token.transfer(msg.sender, token.balanceOf(address(this))), "Transfer failed");
     }
 
     function getSweeper() external view returns (address) {

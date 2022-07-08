@@ -118,6 +118,8 @@ describe('[Challenge] Climber', function () {
         // For something that's clearly so organisationally driven, such as this timelock contract to control a vault, it seems preferable to whitelist who can call ::execute
         // Especially since that is where the arbitrary code execution comes from (even though there are checks in place to try ensure the actions were previously queued)
 
+        // Holy crap I learned so much doing this challenge!! That was so fun!! 
+
     });
 
     after(async function () {
