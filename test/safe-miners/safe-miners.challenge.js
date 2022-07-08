@@ -24,6 +24,13 @@ describe('[Challenge] Safe Miners', function () {
 
     it('Exploit', async function () {
         /** CODE YOUR EXPLOIT HERE */
+
+        // Holy moly, where do I even start lol hehehe
+        // Hmmm I know someone claimed a ton of Optimism tokens by 'claiming' an address that was unfilled yet by being the one to deploy something
+        // deterministically from Ethereum Mainnet to Optimism... but that was a new network I don't think it'll work here...
+
+
+
     });
 
     after(async function () {
