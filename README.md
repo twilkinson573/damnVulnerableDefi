@@ -20,7 +20,7 @@ Created by [@tinchoabbate](https://twitter.com/tinchoabbate)
 * 10 Free rider
 * 11 Backdoor ✅
 * 12 Climber ✅
-* 13 Junior miners
+* 13 Safe miners
 
 ## Play
 

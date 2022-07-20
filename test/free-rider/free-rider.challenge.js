@@ -105,6 +105,30 @@ describe('[Challenge] Free Rider', function () {
 
     it('Exploit', async function () {
         /** CODE YOUR EXPLOIT HERE */
+
+        // So due to the exercise description I have the sneaky feeling this will involve flashloaning ETH haha,
+        // but there isn't a flashloan provider included in this challenge, hmm - can I 'legally' use one from another challenge?
+        // Oh wait there's a Uniswap instance made available to us >:)
+        // Can I use this https://docs.uniswap.org/protocol/V2/guides/smart-contract-integration/using-flash-swaps to flash borrow ETH 
+        // from the UniswapV2 Pair? 
+
+        // So I could 'borrow' ETH from the Uni pair and then return it using the data param - I need a contract with a ::uniswapV2Call func
+
+        // Looks like In FreeRiderNFTMarketplace::buyMany I can bulk buy NFTs while only needing to send enough funds to buy one to satisfy
+        // the require statement in line 72
+        // However, how do we get around line 80 where we have to send ETH? Surely that will revert after the first NFT is purchased and all msg.value is sent?
+
+        const FreeRiderAttackFactory = await ethers.getContractFactory('FreeRiderAttack', attacker);
+        this.attackContract = await FreeRiderAttackFactory.connect(attacker).deploy(
+            this.marketplace.address,
+            this.buyerContract.address,
+            this.uniswap.address,
+            this.nft.address,
+            this.weth.address
+        );
+
+        await this.attackContract.connect(attacker).triggerAttack();
+ 
     });
 
     after(async function () {
