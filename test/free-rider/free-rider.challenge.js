@@ -122,7 +122,7 @@ describe('[Challenge] Free Rider', function () {
         this.attackContract = await FreeRiderAttackFactory.connect(attacker).deploy(
             this.marketplace.address,
             this.buyerContract.address,
-            this.uniswap.address,
+            this.uniswapPair.address,
             this.nft.address,
             this.weth.address
         );

