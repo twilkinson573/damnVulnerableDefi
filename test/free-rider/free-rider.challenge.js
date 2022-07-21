@@ -118,6 +118,9 @@ describe('[Challenge] Free Rider', function () {
         // the require statement in line 72
         // However, how do we get around line 80 where we have to send ETH? Surely that will revert after the first NFT is purchased and all msg.value is sent?
 
+
+        // SOLUTION ===========================================================
+
         const FreeRiderAttackFactory = await ethers.getContractFactory('FreeRiderAttack', attacker);
         this.attackContract = await FreeRiderAttackFactory.connect(attacker).deploy(
             this.marketplace.address,
@@ -128,6 +131,15 @@ describe('[Challenge] Free Rider', function () {
         );
 
         await this.attackContract.connect(attacker).triggerAttack();
+
+        // LESSONS LEARNED ====================================================
+        // Phew this one really took it out of me, I got to the theoretical solution ok but just spent a lot of time fighting
+        // Solidity idiosyncracies. I just need more practice & exposure to all parts of Solidity and build up my instinct
+        // with the error messages more
+        // Especially arrays, oh my god arrays... 
+
+        // Anyway - it's good to get a UniswapV2 Flashswap implementation in the books! It seems really really powerful that I can
+        // use these to flashloan any token that has an appropriate UniV2 pair - I'm sure there'll be lots of cool usecases here!! 
  
     });
 
